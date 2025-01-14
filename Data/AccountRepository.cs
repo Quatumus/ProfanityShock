@@ -45,7 +45,7 @@ namespace ProfanityShock.Data
             await connection.OpenAsync();
 
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT 1 FROM Account";
+            selectCmd.CommandText = "SELECT * FROM Account";
 
             await using var reader = await selectCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())

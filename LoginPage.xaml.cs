@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text;
 using ProfanityShock;
+using ProfanityShock.Data;
 
 namespace ProfanityShock
 {
@@ -18,7 +19,11 @@ namespace ProfanityShock
         {
             InitializeComponent();
 
-            if (AccountManager.GetConfig().Token == null)
+            // AccountRepository.DropTableAsync().Wait();
+
+            AccountManager.LoadSave().Wait();
+
+            if (AccountManager.GetConfig().Token == "")
             {
                 Debug.Print("No token found");
             }

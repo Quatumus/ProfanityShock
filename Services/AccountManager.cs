@@ -11,8 +11,6 @@ namespace ProfanityShock.Services
 {
     public static class AccountManager
     {
-        private static bool _hasBeenInitialized = false;
-
         static AppConfig AccountConfig = new AppConfig()
         {
             Email = "",
@@ -26,17 +24,13 @@ namespace ProfanityShock.Services
             return AccountConfig;
         }
 
-        private static async Task Init()
+        public static async Task LoadSave()
         {
-            if (_hasBeenInitialized)
-                return;
-
             if (await AccountRepository.LoadAsync() != null)
             {
                 AccountConfig = await AccountRepository.LoadAsync();
+                NetManager.ChangeToken(AccountConfig.Token);
             }
-
-            _hasBeenInitialized = true;
         }
 
         public static async Task SaveConfig()
