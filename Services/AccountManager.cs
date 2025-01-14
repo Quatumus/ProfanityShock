@@ -1,5 +1,6 @@
 ﻿using ProfanityShock.Config;
 using ProfanityShock.Data;
+using ProfanityShock.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,7 @@ namespace ProfanityShock.Services
         public static async Task SaveConfig()
         {
             await AccountRepository.SaveItemAsync(AccountConfig);
+            NetManager.ChangeToken(AccountConfig.Token);
         }
     }
 }

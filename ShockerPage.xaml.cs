@@ -10,8 +10,6 @@ namespace ProfanityShock;
 
 public partial class ShockerPage : ContentPage
 {
-    HttpClient client = NetManager.GetClient();
-
     // Create an instance of SettingsRepository
     SettingsRepository repository = new SettingsRepository();
 
@@ -45,7 +43,7 @@ public partial class ShockerPage : ContentPage
     {
         
         // Get all owned shockers from API
-        var response = client.GetAsync("1/shockers/own").Result;
+        var response = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/shockers/own").Result;
 
         if (response.IsSuccessStatusCode)
         {
@@ -98,13 +96,12 @@ public partial class ShockerPage : ContentPage
             }
             else
             {
-                // Debug.Print(response.ToString());
+                Debug.Print(response.ToString());
             }
         }
         else
         {
             Debug.Print(response.StatusCode.ToString());
-            Debug.Print("oopsie");
         }
         // Call SyncItemsAsync on the instance
         repository.SyncItemsAsync(shockers).Wait();
@@ -123,7 +120,7 @@ public partial class ShockerPage : ContentPage
         
         var shockersJson = new { shocks = new [] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync("2/shockers/control", content);
+        var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -149,8 +146,8 @@ public partial class ShockerPage : ContentPage
 
         var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync("2/shockers/control", content);
-
+        var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
+ 
         if (!response.IsSuccessStatusCode)
         {
             Debug.Print($"Error: {response.StatusCode}");
@@ -176,7 +173,7 @@ public partial class ShockerPage : ContentPage
         // Send a post request to api
         var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync("2/shockers/control", content);
+        var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
 
         if (!response.IsSuccessStatusCode)
         {

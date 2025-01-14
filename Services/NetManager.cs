@@ -1,6 +1,9 @@
 ﻿using ProfanityShock.Config;
 using ProfanityShock.Data;
-
+using System.Diagnostics;
+using System.Text.Json;
+using System.Text;
+using ProfanityShock;
 
 namespace ProfanityShock.Services
 {
@@ -9,7 +12,6 @@ namespace ProfanityShock.Services
 
         static HttpClient client = new HttpClient
         {
-            BaseAddress = new Uri("https://api.openshock.com/"),
             DefaultRequestHeaders =
             {
                 { "accept", "application/json" },
@@ -32,6 +34,5 @@ namespace ProfanityShock.Services
             client.DefaultRequestHeaders.Remove("OpenShockToken");
             client.DefaultRequestHeaders.Add("OpenShockToken", token);
         }
-
     }
 }

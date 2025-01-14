@@ -57,9 +57,13 @@
             <Button
                 x:Name="tokenLoginButton"
                 Text="Login with token"
-                SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnTokenLoginButtonClicked"
                 HorizontalOptions="Fill" />
+
+            <Entry
+                x:Name="backendEntry"
+                Placeholder="https://api.openshock.app" />
+
         </VerticalStackLayout>
     </ScrollView>
 
