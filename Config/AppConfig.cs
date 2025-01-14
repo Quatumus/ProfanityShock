@@ -9,7 +9,7 @@ namespace ProfanityShock.Config
 {
     public class AppConfig
     {
-        public Uri Backend { get; set; } = new("https://api.openshock.app");
+        public Uri Backend { get; set; } = new Uri("https://api.openshock.app");
         public string? Token { get; set; }
         public string? Email { get; set; }
         public string? Password { get; set; }

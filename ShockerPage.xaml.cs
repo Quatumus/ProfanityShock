@@ -10,8 +10,6 @@ namespace ProfanityShock;
 
 public partial class ShockerPage : ContentPage
 {
-
-    AppConfig config = AppConfig.GetConfig();
     HttpClient client = NetManager.GetClient();
 
     // Create an instance of SettingsRepository

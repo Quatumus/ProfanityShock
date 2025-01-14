@@ -37,5 +37,10 @@ namespace ProfanityShock.Services
 
             _hasBeenInitialized = true;
         }
+
+        public static async Task SaveConfig()
+        {
+            await AccountRepository.SaveItemAsync(AccountConfig);
+        }
     }
 }

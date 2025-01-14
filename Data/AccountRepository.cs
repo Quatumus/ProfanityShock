@@ -22,10 +22,9 @@ namespace ProfanityShock.Data
                 var createTableCmd = connection.CreateCommand();
                 createTableCmd.CommandText = @" 
                 CREATE TABLE IF NOT EXISTS Account (
-                ID INTEGER PRIMARY KEY,
-                Email TEXT UNIQUE,
+                Token TEXT PRIMARY KEY,
                 Password TEXT,
-                Token TEXT NOT NULL,
+                Email TEXT,
                 Backend TEXT NOT NULL
                 );";
                 await createTableCmd.ExecuteNonQueryAsync();
@@ -46,17 +45,17 @@ namespace ProfanityShock.Data
             await connection.OpenAsync();
 
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT * FROM Account WHERE ID = 1";
+            selectCmd.CommandText = "SELECT 1 FROM Account";
 
             await using var reader = await selectCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
                 return new AppConfig
                 {
-                    Email = reader.GetString(1),
-                    Password = reader.GetString(2),
-                    Token = reader.GetString(3),
-                    Backend = new Uri(reader.GetString(4))
+                    Token = reader.GetString(0),
+                    Password = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Backend = new Uri(reader.GetString(3))
                 };
             }
             else
@@ -74,13 +73,12 @@ namespace ProfanityShock.Data
 
             var saveCmd = connection.CreateCommand();
             saveCmd.CommandText = @"
-            INSERT OR REPLACE INTO Account (ID, Email, Password, Token, Backend)
-            VALUES (@ID, @Email, @Password, @Token, @Backend);";
+            INSERT OR REPLACE INTO Account (Token, Password, Email, Backend)
+            VALUES (@Token, @Password, @Email, @Backend);";
 
-            saveCmd.Parameters.AddWithValue("@ID", 1);
-            saveCmd.Parameters.AddWithValue("@Email", item.Email);
-            saveCmd.Parameters.AddWithValue("@Password", item.Password);
             saveCmd.Parameters.AddWithValue("@Token", item.Token);
+            saveCmd.Parameters.AddWithValue("@Password", item.Password);
+            saveCmd.Parameters.AddWithValue("@Email", item.Email);
             saveCmd.Parameters.AddWithValue("@Backend", item.Backend?.ToString());
 
             return await saveCmd.ExecuteNonQueryAsync();
@@ -93,8 +91,8 @@ namespace ProfanityShock.Data
             await connection.OpenAsync();
 
             var deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = "DELETE FROM Account WHERE Word = @Word";
-            deleteCmd.Parameters.AddWithValue("@Word", item);
+            deleteCmd.CommandText = "DELETE FROM Account WHERE Token = @Token";
+            deleteCmd.Parameters.AddWithValue("@Token", item);
 
             return await deleteCmd.ExecuteNonQueryAsync();
         }
