@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProfanityShock.ShockerPage"
+             Title="Shocker Settings">
+    <ScrollView>
+        <VerticalStackLayout>
+            <CollectionView x:Name="shockersList"
+                            ItemsLayout="VerticalGrid, 3"
+                            HorizontalOptions="FillAndExpand">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="LightGray"
+                               Padding="20"
+                               Margin="20"
+                               WidthRequest="350">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}"
+                                       HorizontalOptions="Center" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Slider Minimum="1"
+                                            Maximum="100"
+                                            Value="{Binding Intensity, Mode=TwoWay}"
+                                            HorizontalOptions="FillAndExpand"
+                                            ValueChanged="SaveSettings" />
+                                    <Label Text="{Binding Intensity, StringFormat='Intensity: {0:F0}%'}" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Slider Minimum="300"
+                                            Maximum="30000"
+                                            Value="{Binding Duration, Mode=TwoWay}"
+                                            HorizontalOptions="FillAndExpand" />
+                                    <Label Text="{Binding Duration, StringFormat='Duration: {0:F0}ms'}" />
+                                </StackLayout>
+                                <HorizontalStackLayout HorizontalOptions="Center"
+                                                       Spacing="10">
+                                    <Button Text="Shock"
+                                            HorizontalOptions="FillAndExpand"
+                                            Clicked="OnShockButtonClicked">
+                                    </Button>
+                                    <Button Text="Vibrate"
+                                            HorizontalOptions="FillAndExpand"
+                                            Clicked="OnVibrateButtonClicked">
+                                    </Button>
+                                    <Button Text="Beep"
+                                            HorizontalOptions="FillAndExpand"
+                                            Clicked="OnSoundButtonClicked">
+                                    </Button>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+

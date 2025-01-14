@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProfanityShock.LoginPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a hovercraft number nine" />
+
+            <Label
+                Text="Login into your account!"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+            
+            
+            <Entry
+                x:Name="emailEntry"
+                Placeholder="Email" />
+            
+            <Entry
+                x:Name="passwordEntry"
+                Placeholder="Password"
+                IsPassword="true" />
+            
+            <Button
+                x:Name="loginButton"
+                Text="Login"
+                Clicked="OnLoginButtonClicked" />
+            
+            <Button
+                x:Name="logoutButton"
+                Text="Logout"
+                Clicked="OnLogoutButtonClicked" />
+            
+            <Button
+                x:Name="SessionButton"
+                Text="Session Info"
+                Clicked="OnSessionButtonClicked" />
+
+            <Label
+                Text="Or use a token :)"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+
+            <Entry
+                x:Name="tokenEntry"
+                Placeholder="API Token"
+                IsPassword="true" />
+            
+            <Button
+                x:Name="tokenLoginButton"
+                Text="Login with token"
+                SemanticProperties.Hint="Counts the number of times you click"
+                Clicked="OnTokenLoginButtonClicked"
+                HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
