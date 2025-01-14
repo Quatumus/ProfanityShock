@@ -71,6 +71,12 @@ namespace ProfanityShock.Data
             await using var connection = new SqliteConnection(Constants.DatabasePath);
             await connection.OpenAsync();
 
+            // delete old data
+            var deleteCmd = connection.CreateCommand();
+            deleteCmd.CommandText = "DELETE FROM Account";
+            await deleteCmd.ExecuteNonQueryAsync();
+
+            // save new data
             var saveCmd = connection.CreateCommand();
             saveCmd.CommandText = @"
             INSERT OR REPLACE INTO Account (Token, Password, Email, Backend)
@@ -91,8 +97,7 @@ namespace ProfanityShock.Data
             await connection.OpenAsync();
 
             var deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = "DELETE FROM Account WHERE Token = @Token";
-            deleteCmd.Parameters.AddWithValue("@Token", item);
+            deleteCmd.CommandText = "DELETE FROM Account";
 
             return await deleteCmd.ExecuteNonQueryAsync();
         }

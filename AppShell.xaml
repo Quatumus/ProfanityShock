@@ -16,7 +16,7 @@
         ContentTemplate="{DataTemplate local:ShockerPage}"
         Route="ShockerPage" />
     <ShellContent
-        Title="Live View"
+        Title="Voice Recognition"
         ContentTemplate="{DataTemplate local:LiveView}"
         Route="LiveView" />
 </Shell>

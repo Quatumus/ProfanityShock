@@ -6,11 +6,11 @@ using System.Diagnostics;
 
 namespace ProfanityShock.Data
 {
-    internal class SettingsRepository
+    internal static class SettingsRepository
     {
-        private bool _hasBeenInitialized = false;
+        private static bool _hasBeenInitialized = false;
         
-        private async Task Init()
+        private static async Task Init()
         {
             if (_hasBeenInitialized)
                 return;
@@ -42,7 +42,7 @@ namespace ProfanityShock.Data
             _hasBeenInitialized = true;
         }
 
-        public async Task<List<Shocker>> ListAsync()
+        public static async Task<List<Shocker>> ListAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -71,7 +71,7 @@ namespace ProfanityShock.Data
 
         }
 
-        public async Task<int> SaveItemAsync(Shocker item)
+        public static async Task<int> SaveItemAsync(Shocker item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -79,8 +79,8 @@ namespace ProfanityShock.Data
 
             var saveCmd = connection.CreateCommand();
             saveCmd.CommandText = @"
-            INSERT OR REPLACE INTO Shocker (ID, Name, Intensity, Duration, Delay, Warning, Controltype)
-            VALUES (@ID, @Name, @Intensity, @Duration, @Delay, @Warning, @Controltype);";
+            UPDATE Shocker SET Name = @Name, Intensity = @Intensity, Duration = @Duration, Delay = @Delay, Warning = @Warning, Controltype = @Controltype
+            WHERE ID = @ID;";
 
             saveCmd.Parameters.AddWithValue("@ID", item.ID);
             saveCmd.Parameters.AddWithValue("@Name", item.Name);
@@ -90,10 +90,21 @@ namespace ProfanityShock.Data
             saveCmd.Parameters.AddWithValue("@Warning", item.Warning);
             saveCmd.Parameters.AddWithValue("@Controltype", item.Controltype);
 
-            return await saveCmd.ExecuteNonQueryAsync();
+            var rowsAffected = await saveCmd.ExecuteNonQueryAsync();
+
+            if (rowsAffected == 0)
+            {
+                saveCmd.CommandText = @"
+                INSERT INTO Shocker (ID, Name, Intensity, Duration, Delay, Warning, Controltype)
+                VALUES (@ID, @Name, @Intensity, @Duration, @Delay, @Warning, @Controltype);";
+
+                rowsAffected = await saveCmd.ExecuteNonQueryAsync();
+            }
+
+            return rowsAffected;
         }
 
-        public async Task<int> DeleteItemAsync(Shocker item)
+        public static async Task<int> DeleteItemAsync(Shocker item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -106,7 +117,7 @@ namespace ProfanityShock.Data
             return await deleteCmd.ExecuteNonQueryAsync();
         }
 
-        public async Task<int> SyncItemsAsync(List<Shocker> items)
+        public static async Task<int> SyncItemsAsync(List<Shocker> items)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -141,7 +152,7 @@ namespace ProfanityShock.Data
             return 1;
         }
 
-        public async Task DropTableAsync()
+        public static async Task DropTableAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);

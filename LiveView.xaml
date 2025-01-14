@@ -2,24 +2,27 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProfanityShock.LiveView"
-             Title="LiveView">
-    <HorizontalStackLayout HorizontalOptions="FillAndExpand">
-        <ScrollView HorizontalOptions="FillAndExpand">
+             Title="Voice Recognition">
+    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand" Spacing="40">
+        <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
             <Label x:Name="label"
-                   HeightRequest="500"
-                   WidthRequest="300"
-                   VerticalTextAlignment="Start"
-                   VerticalOptions="FillAndExpand"
-                   HorizontalOptions="FillAndExpand"
+                   HeightRequest="200"
+                   WidthRequest="500"
+                   VerticalTextAlignment="Center"
+                   HorizontalTextAlignment="Center"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
                    LineBreakMode="WordWrap"
+                   BackgroundColor="LightGray"
                    Text="Start speaking..." />
         </ScrollView>
         <Button x:Name="toggleButton"
-                WidthRequest="100"
+                WidthRequest="150"
                 HeightRequest="44"
-                HorizontalOptions="End"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
                 Text="Start Recognition"
                 Clicked="OnToggleRecognitionButtonClicked" />
-    </HorizontalStackLayout>
+    </VerticalStackLayout>
 </ContentPage>
 

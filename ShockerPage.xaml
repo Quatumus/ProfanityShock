@@ -29,7 +29,8 @@
                                     <Slider Minimum="300"
                                             Maximum="30000"
                                             Value="{Binding Duration, Mode=TwoWay}"
-                                            HorizontalOptions="FillAndExpand" />
+                                            HorizontalOptions="FillAndExpand"
+                                            ValueChanged="SaveSettings" />
                                     <Label Text="{Binding Duration, StringFormat='Duration: {0:F0}ms'}" />
                                 </StackLayout>
                                 <HorizontalStackLayout HorizontalOptions="Center"
