@@ -8,13 +8,13 @@
     Title="ProfanityShock">
 
     <ShellContent
-        Title="Shockers"
-        ContentTemplate="{DataTemplate local:ShockerPage}"
-        Route="ShockerPage" />
-    <ShellContent
         Title="Voice Recognition"
         ContentTemplate="{DataTemplate local:LiveView}"
         Route="LiveView" />
+    <ShellContent
+        Title="Shockers"
+        ContentTemplate="{DataTemplate local:ShockerPage}"
+        Route="ShockerPage" />
     <ShellContent
         Title="Custom Word List"
         ContentTemplate="{DataTemplate local:CustomListPage}"

@@ -14,6 +14,8 @@ public partial class ShockerPage : ContentPage
     // Create a list of Shocker objects
     List<Shocker> shockers = new List<Shocker>();
 
+    internal int Delay = 0;
+
     public ShockerPage()
     {
         InitializeComponent();
@@ -27,7 +29,37 @@ public partial class ShockerPage : ContentPage
         // Code to run every time the page is switched to
         SyncShockers().Wait();
         shockersList.ItemsSource = shockers;
+
+        switch (shockers[0].Warning)
+        {
+            case ControlType.Stop:
+                warningModeLabel.Text = "Warning mode: None";
+                break;
+            case ControlType.Vibrate:
+                warningModeLabel.Text = "Warning mode: Vibrate";
+                break;
+            case ControlType.Sound:
+                warningModeLabel.Text = "Warning mode: Sound";
+                break;
+        }
+        Delay = shockers[0].Delay;
+        delaySlider.Value = Delay;
+        delayLabel.Text = $"Delay: {Delay}ms";
         
+    }
+
+    private async void OnDelaySliderValueChanged(object sender, EventArgs e)
+    {
+        var slider = (Slider)sender;
+        Delay = (int)slider.Value;
+
+        foreach (var shocker in shockers)
+        {
+            shocker.Delay = Delay;
+            await SettingsRepository.SaveItemAsync(shocker);
+        }
+        
+        delayLabel.Text = $"Delay: {Delay}ms";
     }
 
     private async Task SyncShockers()
@@ -181,47 +213,41 @@ public partial class ShockerPage : ContentPage
         var shocker = (Shocker)((Slider)sender).BindingContext;
         
         await SettingsRepository.SaveItemAsync(shocker);
-
+        
         var shocklist = await SettingsRepository.ListAsync();     
     }
 
     
     private async void OnWarningNoneButtonClicked(object sender, EventArgs e)
     {
-        var button = (Button)sender;
-
-        if (button.BindingContext is not Shocker shocker)
-            return;
-
-        shocker.Warning = ControlType.Stop;
-        await SettingsRepository.SaveItemAsync(shocker);
-
-        Debug.Print($"Warning button none pressed on Shocker with ID: {shocker.ID}");
+        foreach (var shocker in shockers)
+        {
+            shocker.Warning = ControlType.Stop;
+            await SettingsRepository.SaveItemAsync(shocker);
+        }
+        
+        warningModeLabel.Text = "Warning mode: None";
     }
 
     private async void OnWarningVibrateButtonClicked(object sender, EventArgs e)
     {
-        var button = (Button)sender;
+        foreach (var shocker in shockers)
+        {
+            shocker.Warning = ControlType.Vibrate;
+            await SettingsRepository.SaveItemAsync(shocker);
+        }
 
-        if (button.BindingContext is not Shocker shocker)
-            return;
-
-        shocker.Warning = ControlType.Vibrate;
-        await SettingsRepository.SaveItemAsync(shocker);
-
-        Debug.Print($"Warning button vibrate pressed on Shocker with ID: {shocker.ID}");
+        warningModeLabel.Text = "Warning mode: Vibrate";
     }
 
     private async void OnWarningSoundButtonClicked(object sender, EventArgs e)
     {
-        var button = (Button)sender;
+        foreach (var shocker in shockers)
+        {
+            shocker.Warning = ControlType.Sound;
+            await SettingsRepository.SaveItemAsync(shocker);
+        }
 
-        if (button.BindingContext is not Shocker shocker)
-            return;
-
-        shocker.Warning = ControlType.Sound;
-        await SettingsRepository.SaveItemAsync(shocker);
-
-        Debug.Print($"Warning button sound pressed on Shocker with ID: {shocker.ID}");
+        warningModeLabel.Text = "Warning mode: Sound";
     }
 }

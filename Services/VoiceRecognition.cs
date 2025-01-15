@@ -4,6 +4,7 @@ using ProfanityShock.Data;
 using ProfanityShock;
 using System.Text.Json;
 using System.Text;
+using static ProfanityShock.Services.LiveViewInterface;
 
 
 namespace ProfanityShock.Services
@@ -11,7 +12,8 @@ namespace ProfanityShock.Services
 {
     internal class VoiceRecognition
     {
-
+        // Declare an interface instance.
+        private static ILiveViewInterface obj = new ImplementationClass();
         public static bool Active;
         public static string? Text; //spoken text
         public static async void Recognition(bool UseAzureList, List<string> words)
@@ -43,6 +45,7 @@ namespace ProfanityShock.Services
                             if (containsProfanity || Text.Contains('*'))
                             {
                                 Debug.Print("Profanity detected");
+                                obj.SetText();
 
                                 var shockers = await SettingsRepository.ListAsync();
                                 foreach (var shocker in shockers)
@@ -55,22 +58,21 @@ namespace ProfanityShock.Services
                                             var contentwarning = new StringContent(JsonSerializer.Serialize(shockersJsonwarning), Encoding.UTF8, "application/json");
                                             await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", contentwarning);
                                         }
-                                        await Task.Delay(shocker.Delay);
-                                        var shockersJson = new { shocks = new [] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
-                                        var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
-                                        await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
                                     }
+                                }
+                                await Task.Delay(shockers[0].Delay + 100);
+                                foreach (var shocker in shockers)
+                                {
+                                    var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
+                                    var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
+                                    await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
                                 }
                             }
 
                             Debug.Print(Text);
 
-                            var liveView = App.Current.Windows[0].Page.Navigation.NavigationStack.FirstOrDefault(x => x is LiveView) as LiveView;
-                            if (liveView != null)
-                            {
-                                liveView.UpdateTextBox();
-                            }
-                            
+                            obj.SetText();
+
                             speechRecognized = true;
                         }
                     }
