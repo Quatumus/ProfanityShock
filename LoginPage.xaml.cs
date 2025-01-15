@@ -87,6 +87,10 @@ namespace ProfanityShock
 
             loginButton.Text = "Logging in...";
             SemanticScreenReader.Announce(loginButton.Text);
+
+            await Task.Delay(1000);
+
+            await Navigation.PushAsync(new LiveView());
         }
 
         private void OnLogoutButtonClicked(object sender, EventArgs e)

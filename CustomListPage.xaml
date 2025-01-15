@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProfanityShock.CustomListPage"
+             Title="Custom Word List">
+    <VerticalStackLayout>
+        <Entry
+            x:Name="textInput"
+            Placeholder="Enter some text"
+            Margin="20"/>
+        <Button
+            Text="Add to List"
+            Margin="20"
+            Clicked="OnAddButtonClicked"/>
+        <ScrollView>
+            <CollectionView x:Name="itemsList"
+                            ItemsLayout="VerticalGrid, 5"
+                            HorizontalOptions="FillAndExpand">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="LightGray"
+                                Padding="20"
+                                Margin="20"
+                                WidthRequest="{Binding .,Converter={StaticResource StringLengthToWidthConverter}}">
+                            <HorizontalStackLayout>
+                                <Button Text="Remove"
+                                        HorizontalOptions="Start"
+                                        Clicked="OnRemoveButtonClicked">
+                                    </Button>
+                                <Label Text="{Binding .}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Padding="10" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+    </VerticalStackLayout>
+</ContentPage>
+

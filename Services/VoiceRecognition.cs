@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Speech.Recognition;
-using System.Globalization;
+﻿using Microsoft.CognitiveServices.Speech;
 using System.Diagnostics;
+
 
 
 namespace ProfanityShock.Services
@@ -14,41 +9,47 @@ namespace ProfanityShock.Services
     internal class VoiceRecognition
     {
 
-        public static void Recognition() // edited example taken from https://www.nuget.org/packages/System.Speech/#readme-body-tab
+        public static bool Active;
+        public static async void Recognition(bool UseAzureList, List<string> words)
         {
+            await DoRecognition();
 
-            // Create a new SpeechRecognitionEngine instance.
-            using SpeechRecognizer recognizer = new SpeechRecognizer();
-            using ManualResetEvent exit = new ManualResetEvent(false);
-
-            // Create a simple grammar that recognizes words from a list.
-            Choices choices = new Choices();
-            choices.Add(new string[] { "red", "green", "blue", "exit" });
-
-            // Create a GrammarBuilder object and append the Choices object.
-            GrammarBuilder gb = new GrammarBuilder();
-            gb.Append(choices);
-
-            // Create the Grammar instance and load it into the speech recognition engine.
-            Grammar g = new Grammar(gb);
-            recognizer.LoadGrammar(g);
-
-            // Register a handler for the SpeechRecognized event.
-            recognizer.SpeechRecognized += (s, e) =>
-            {
-                Debug.Print($"Recognized: {e.Result.Text}, Confidence: {e.Result.Confidence}");
-                if (e.Result.Text == "exit")
+            async Task DoRecognition()
+            {   // if you plan to fork this project, please make your own subscription on azure (it's free)
+                var config = SpeechConfig.FromSubscription("8spUbABMG6NQUfeAwIHhNhOUpt7XZAuYk0GRq1ep3Nxl2A2zME4hJQQJ99BAACi5YpzXJ3w3AAAYACOGJbZt", "northeurope"); 
+                if (!UseAzureList)
                 {
-                    exit.Set();
+                    config.SetProfanity(ProfanityOption.Raw);
                 }
-            };
+                using var recognizer = new SpeechRecognizer(config);
 
-            // Emulate
-            Debug.Print("Emulating \"red\".");
-            recognizer.EmulateRecognize("red");
+                while (Active)
+                {
+                    bool speechRecognized = false;
 
-            Debug.Print("Speak red, green, blue, or exit please...");
+                    while (!speechRecognized)
+                    {
+                        var result = await recognizer.RecognizeOnceAsync();
 
+                        if (result.Reason == ResultReason.RecognizedSpeech)
+                        {
+                            string userChoice = result.Text.Trim().ToLower();
+
+                            var containsProfanity = words.Any(word => userChoice.Contains(word, StringComparison.OrdinalIgnoreCase));
+                            if (containsProfanity || userChoice.Contains('*'))
+                            {
+                                Debug.Print("Profanity detected or contains '*'");
+
+                            }
+
+                            Debug.Print(userChoice);
+                            
+                            speechRecognized = true;
+                        }
+                    }
+                }
+            }
         }
     }
 }
+

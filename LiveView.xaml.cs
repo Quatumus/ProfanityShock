@@ -1,4 +1,5 @@
 using ProfanityShock.Services;
+using ProfanityShock.Data;
 
 namespace ProfanityShock;
 
@@ -7,19 +8,20 @@ public partial class LiveView : ContentPage
 	public LiveView()
 	{
 		InitializeComponent();
-	}
 
-    bool isListening = false;
+    }
 
-    private void OnToggleRecognitionButtonClicked(object sender, EventArgs e)
+    private async void OnToggleRecognitionButtonClicked(object sender, EventArgs e)
     {
         var button = (Button)sender;
-        button.Text = button.Text == "Start Recognition" ? "Stop Recognition" : "Start Recognition";
+        button.Text = button.Text == "Start Listening" ? "Stop Listening" : "Start Listening";
 
-        if (button.Text == "Start Recognition")
+        VoiceRecognition.Active = button.Text == "Stop Listening";
+
+        if (button.Text == "Stop Listening")
         {
-            //VoiceRecognition.Recognition();
+            var words = WordListManager.GetList();
+            VoiceRecognition.Recognition(true, words);
         }
-
 	}
 }

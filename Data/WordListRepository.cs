@@ -7,9 +7,9 @@ namespace ProfanityShock.Data
 {
     internal class WordListRepository
     {
-        private bool _hasBeenInitialized = false;
+        private static bool _hasBeenInitialized = false;
 
-        private async Task Init()
+        private static async Task Init()
         {
             if (_hasBeenInitialized)
                 return;
@@ -35,7 +35,7 @@ namespace ProfanityShock.Data
             _hasBeenInitialized = true;
         }
 
-        public async Task<List<string>> ListAsync()
+        public static async Task <List<string>> ListAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -55,7 +55,7 @@ namespace ProfanityShock.Data
 
         }
 
-        public async Task<int> UpdateListAsync(List<string> items)
+        public static async Task<int> UpdateListAsync(List<string> items)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -88,7 +88,7 @@ namespace ProfanityShock.Data
         }
 
 
-        public async Task<int> SaveItemAsync(string item)
+        public static async Task<int> SaveItemAsync(string item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -104,7 +104,7 @@ namespace ProfanityShock.Data
             return await saveCmd.ExecuteNonQueryAsync();
         }
 
-        public async Task<int> DeleteItemAsync(string item)
+        public static async Task<int> DeleteItemAsync(string item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -117,7 +117,7 @@ namespace ProfanityShock.Data
             return await deleteCmd.ExecuteNonQueryAsync();
         }
 
-        public async Task DropTableAsync()
+        public static async Task DropTableAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
