@@ -23,10 +23,14 @@ namespace ProfanityShock
             if (AccountManager.GetConfig().Token == "")
             {
                 Debug.Print("No token found");
+                loggedInLayout.IsVisible = false;
+                loginLayout.IsVisible = true;
             }
             else
             {
                 Debug.Print("Token found: " + AccountManager.GetConfig().Token);
+                loginLayout.IsVisible = false;
+                loggedInLayout.IsVisible = true;
             }
         }
 
@@ -100,6 +104,17 @@ namespace ProfanityShock
             if (response.IsSuccessStatusCode)
             {
                 Debug.Print("Logout successful!");
+
+                AccountRepository.DeleteItemAsync(AccountManager.GetConfig().Token).Wait();
+
+                AccountManager.GetConfig().Token = "";
+                AccountManager.GetConfig().Email = "";
+                AccountManager.GetConfig().Password = "";
+
+                NetManager.ChangeToken("");
+
+                loginLayout.IsVisible = true;
+                loggedInLayout.IsVisible = false;
             }
             else
             {

@@ -182,11 +182,46 @@ public partial class ShockerPage : ContentPage
         
         await SettingsRepository.SaveItemAsync(shocker);
 
-        var shocklist = await SettingsRepository.ListAsync();
+        var shocklist = await SettingsRepository.ListAsync();     
+    }
 
-        foreach (var item in shocklist)
-        {
-            Debug.Print(item.Intensity.ToString());
-        }        
+    
+    private async void OnWarningNoneButtonClicked(object sender, EventArgs e)
+    {
+        var button = (Button)sender;
+
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Stop;
+        await SettingsRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button none pressed on Shocker with ID: {shocker.ID}");
+    }
+
+    private async void OnWarningVibrateButtonClicked(object sender, EventArgs e)
+    {
+        var button = (Button)sender;
+
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Vibrate;
+        await SettingsRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button vibrate pressed on Shocker with ID: {shocker.ID}");
+    }
+
+    private async void OnWarningSoundButtonClicked(object sender, EventArgs e)
+    {
+        var button = (Button)sender;
+
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Sound;
+        await SettingsRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button sound pressed on Shocker with ID: {shocker.ID}");
     }
 }

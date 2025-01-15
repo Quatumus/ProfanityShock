@@ -14,7 +14,7 @@
                    HorizontalOptions="Center"
                    LineBreakMode="WordWrap"
                    BackgroundColor="LightGray"
-                   Text="Start speaking..." />
+                   Text="This is where all your yap goes." />
         </ScrollView>
         <Button x:Name="toggleButton"
                 WidthRequest="150"

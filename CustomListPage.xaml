@@ -6,7 +6,7 @@
     <VerticalStackLayout>
         <Entry
             x:Name="textInput"
-            Placeholder="Enter some text"
+            Placeholder="Ceperate words with a space."
             Margin="20"/>
         <Button
             Text="Add to List"

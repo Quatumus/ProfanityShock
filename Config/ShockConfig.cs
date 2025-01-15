@@ -17,12 +17,12 @@ namespace ProfanityShock.Config
         public required string ID { get; set; }
         public string? Device { get; set; }
         public required ControlType Controltype { get; set; } = ControlType.Shock;
-        public required int Warning { get; set; }
-        public required float Delay { get; set; }
+        public required ControlType Warning { get; set; } = ControlType.Vibrate;
         public bool Paused { get; set; }
 
         private int intensity;
         private int duration;
+        private int delay;
 
         public int Intensity
         {
@@ -41,6 +41,16 @@ namespace ProfanityShock.Config
             {
                 duration = value;
                 OnPropertyChanged(nameof(Duration));
+            }
+        }
+
+        public int Delay
+        {
+            get { return delay; }
+            set
+            {
+                delay = value;
+                OnPropertyChanged(nameof(Delay));
             }
         }
 

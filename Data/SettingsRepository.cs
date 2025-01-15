@@ -62,7 +62,7 @@ namespace ProfanityShock.Data
                     Intensity = reader.GetInt32(2),
                     Duration = reader.GetInt32(3),
                     Delay = reader.GetInt32(4),
-                    Warning = reader.GetInt32(5),
+                    Warning = (ControlType)reader.GetInt32(5),
                     Controltype = (ControlType)reader.GetInt32(6)
                 });
             }
