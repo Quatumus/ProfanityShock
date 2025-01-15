@@ -10,7 +10,7 @@ namespace ProfanityShock.Services
     {
         public interface ILiveViewInterface
         {
-            void SetText();
+            void SetText(string sentence);
         }
     }
 }

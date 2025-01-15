@@ -11,12 +11,12 @@ namespace ProfanityShock;
 class ImplementationClass : ILiveViewInterface
 {
     // Explicit interface member implementation:
-    void ILiveViewInterface.SetText()
+    void ILiveViewInterface.SetText(string sentence)
     {
         //get current content page from appshell
         var appShell = (AppShell)Application.Current.MainPage;
         var liveView = (LiveView)appShell.CurrentPage;
-        liveView.UpdateTextBox();
+        liveView.UpdateTextBox(sentence);
     }
 }
 public partial class LiveView : ContentPage
@@ -26,9 +26,9 @@ public partial class LiveView : ContentPage
 		InitializeComponent();
     }
 
-    public void UpdateTextBox()
+    public void UpdateTextBox(string text)
     {
-        textBox.Text = VoiceRecognition.Text;
+        textBox.Text = text;
         Debug.Print("Updated text box!");
     }
 
@@ -42,12 +42,7 @@ public partial class LiveView : ContentPage
         var button = (Button)sender;
         button.Text = button.Text == "Start Recognition" ? "Stop Recognition" : "Start Recognition";
 
-        VoiceRecognition.Active = button.Text == "Stop Recognition";
-
-        if (button.Text == "Stop Recognition")
-        {
-            var words = WordListManager.GetList();
-            VoiceRecognition.Recognition(recognitionModeButton.Text == "Recognition mode: Azure + custom", words);
-        }
+        var words = WordListManager.GetList();
+        VoiceRecognition.Recognition(button.Text == "Stop Recognition", words);
 	}
 }
