@@ -63,7 +63,15 @@
                 Padding="30,0"
                 Spacing="25">
                 <Label
-                    x:Name="loggedInAsLabel" />
+                    Text="You are logged in as:"
+                    HorizontalOptions="Center" 
+                    Style="{StaticResource Headline}"
+                    SemanticProperties.HeadingLevel="Level1" />
+                <Label
+                    x:Name="loggedInAsLabel" 
+                    HorizontalOptions="Center"
+                    Style="{StaticResource Headline}"
+                    SemanticProperties.HeadingLevel="Level1" />
                 <Button
                     x:Name="logoutButton"
                     Text="Logout"

@@ -6,7 +6,7 @@
     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand" Spacing="40">
         <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
             <Label x:Name="textBox"
-                   HeightRequest="200"
+                   HeightRequest="300"
                    WidthRequest="500"
                    VerticalTextAlignment="Center"
                    HorizontalTextAlignment="Center"
