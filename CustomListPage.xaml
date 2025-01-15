@@ -18,7 +18,7 @@
                             HorizontalOptions="FillAndExpand">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="LightGray"
+                        <Border BackgroundColor="{StaticResource Gray500}"
                                 Padding="20"
                                 Margin="20"
                                 WidthRequest="{Binding .,Converter={StaticResource StringLengthToWidthConverter}}">

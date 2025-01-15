@@ -19,8 +19,7 @@
                     Text="Login into your account!"
                     Style="{StaticResource Headline}"
                     SemanticProperties.HeadingLevel="Level1" />
-                
-                
+                    
                 <Entry
                     x:Name="emailEntry"
                     Placeholder="Email" />

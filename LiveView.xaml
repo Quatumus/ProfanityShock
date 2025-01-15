@@ -13,7 +13,6 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Center"
                    LineBreakMode="WordWrap"
-                   BackgroundColor="LightGray"
                    Text="This is where all your yap goes." />
         </ScrollView>
         <Button x:Name="toggleButton"

@@ -41,10 +41,10 @@
                             HorizontalOptions="FillAndExpand">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="LightGray"
-                               Padding="20"
-                               Margin="20"
-                               WidthRequest="350">
+                        <Border BackgroundColor="{StaticResource Gray500}"
+                                Padding="20"
+                                Margin="20"
+                                WidthRequest="350">
                             <VerticalStackLayout Spacing="10">
                                 <Label Text="{Binding Name}"
                                        HorizontalOptions="Center" />
