@@ -5,7 +5,7 @@
              Title="Voice Recognition">
     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand" Spacing="40">
         <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
-            <Label x:Name="label"
+            <Label x:Name="textBox"
                    HeightRequest="200"
                    WidthRequest="500"
                    VerticalTextAlignment="Center"
@@ -23,6 +23,13 @@
                 VerticalOptions="Center"
                 Text="Start Recognition"
                 Clicked="OnToggleRecognitionButtonClicked" />
+        <Button x:Name="recognitionModeButton"
+                WidthRequest="300"
+                HeightRequest="44"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Text="Recognition mode: Azure + custom"
+                Clicked="OnRecognitionModeButtonClicked" />
     </VerticalStackLayout>
 </ContentPage>
 

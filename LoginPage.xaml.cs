@@ -31,18 +31,23 @@ namespace ProfanityShock
                 Debug.Print("Token found: " + AccountManager.GetConfig().Token);
                 loginLayout.IsVisible = false;
                 loggedInLayout.IsVisible = true;
+                var accountinfo = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/users/self").GetAwaiter().GetResult();
+                var json = accountinfo.Content.ReadAsStringAsync();
+                var dataObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                if (dataObject != null && dataObject.TryGetValue("data", out var dataObjectValue) &&
+                    dataObject is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var accountElement in dataElement.EnumerateArray())
+                    {
+                        if (accountElement.TryGetProperty("name", out var nameProperty) &&
+                            nameProperty.ValueKind == JsonValueKind.String)
+                        {
+                            loggedInAsLabel.Text = nameProperty.GetString();
+                        }
+                    }
+                }
             }
-        }
-
-        private async void OnCounterClicked(object sender, EventArgs e)
-        {
-            // testi mielessä hakee aktiiviset laitteet serveriltä ja tekee debug viestin
-
-            //config.Backend = new Uri("https://api.openshock.app");
-
-            string response = await NetManager.GetClient().GetStringAsync(AccountManager.GetConfig().Backend + "1/public/stats");
-
-            Debug.Print(response);
         }
 
         private async void OnLoginButtonClicked(object sender, EventArgs e)
@@ -55,6 +60,9 @@ namespace ProfanityShock
             {
                 AccountManager.GetConfig().Backend = new Uri(backendEntry.Text);
             }
+
+            loginButton.Text = "Logging in...";
+            SemanticScreenReader.Announce(loginButton.Text);
 
             var requestBody = new {password, usernameOrEmail, turnstileResponse };
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
@@ -87,12 +95,14 @@ namespace ProfanityShock
             else
             {
                 Debug.Print("Login failed!");
+                loginButton.Text = "Invalid credentials";
+                SemanticScreenReader.Announce(loginButton.Text);
             }
 
-            loginButton.Text = "Logging in...";
-            SemanticScreenReader.Announce(loginButton.Text);
-
             await Task.Delay(1000);
+
+            loginButton.Text = "Login";
+            SemanticScreenReader.Announce(loginButton.Text);
 
             await Navigation.PushAsync(new LiveView());
         }
@@ -110,6 +120,7 @@ namespace ProfanityShock
                 AccountManager.GetConfig().Token = "";
                 AccountManager.GetConfig().Email = "";
                 AccountManager.GetConfig().Password = "";
+                AccountManager.GetConfig().Backend = new Uri("https://api.openshock.app");
 
                 NetManager.ChangeToken("");
 

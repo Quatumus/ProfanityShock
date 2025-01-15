@@ -16,7 +16,7 @@ public partial class ShockerPage : ContentPage
 
     public ShockerPage()
     {
-        InitializeComponent(); // pretty much all errors here are just gaslight by intellisense
+        InitializeComponent();
 
     }
 
