@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using ProfanityShock.Data;
-using ProfanityShock;
 using System.Text.Json;
 using System.Text;
 using System.Speech.Recognition;
@@ -16,23 +15,18 @@ namespace ProfanityShock.Services
         // Declare an interface instance.
         private static ILiveViewInterface obj = new ImplementationClass();
 
+        private static string language = SettingsRepository.LoadAsync().Result?.Language ?? "en-US";
+
         private static SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine(
-        new System.Globalization.CultureInfo("en-US"));
+            new System.Globalization.CultureInfo(language));
 
         public static void Recognition(bool Activate, List<string> words)
         {
-            foreach (var ri in SpeechRecognitionEngine.InstalledRecognizers())
-            {         
-                Debug.Print(ri.Culture.ToString()); 
-            }
-
             if (Activate)
             {
 
-
-
-                Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-                Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
+                Thread.CurrentThread.CurrentCulture = new CultureInfo(language);
+                Thread.CurrentThread.CurrentUICulture = new CultureInfo(language);
 
                 // Create a simple grammar that recognizes words from a list.
                 Choices choices = new Choices();
@@ -66,34 +60,37 @@ namespace ProfanityShock.Services
         {
             Debug.Print("Recognized text: " + e.Result.Text);
 
-            obj.SetText(e.Result.Text);
+            obj.SetText(e.Result.Text, (int)(e.Result.Confidence * 100));
 
             if (WordListManager.GetList().Any(word => e.Result.Text.Contains(word, StringComparison.OrdinalIgnoreCase)))
             {
                 Debug.Print("Profanity detected");
 
-                var shockers = await ShockerRepository.ListAsync();
-                foreach (var shocker in shockers)
+                if (e.Result.Confidence >= SettingsRepository.LoadAsync().Result?.MinConfidence)
                 {
-                    if (shocker.Intensity > 0)
+                    var shockers = await ShockerRepository.ListAsync();
+                    foreach (var shocker in shockers)
                     {
-                        if (shocker.Warning != ControlType.Stop)
+                        if (shocker.Intensity > 0)
                         {
-                            var shockersJsonwarning = new { shocks = new[] { new { id = shocker.ID, type = shocker.Warning.ToString(), intensity = shocker.Intensity, duration = shocker.Delay, exclusive = true } }, customName = "ProfanityShock API call" };
-                            var contentwarning = new StringContent(JsonSerializer.Serialize(shockersJsonwarning), Encoding.UTF8, "application/json");
-                            await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", contentwarning);
+                            if (shocker.Warning != ControlType.Stop)
+                            {
+                                var shockersJsonwarning = new { shocks = new[] { new { id = shocker.ID, type = shocker.Warning.ToString(), intensity = shocker.Intensity, duration = shocker.Delay, exclusive = true } }, customName = "ProfanityShock API call" };
+                                var contentwarning = new StringContent(JsonSerializer.Serialize(shockersJsonwarning), Encoding.UTF8, "application/json");
+                                await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", contentwarning);
+                            }
                         }
                     }
-                }
-                if (shockers[0].Delay > 0)
-                {
-                    await Task.Delay(shockers[0].Delay + 300);
-                }
-                foreach (var shocker in shockers)
-                {
-                    var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
-                    var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
-                    await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
+                    if (shockers[0].Delay > 0)
+                    {
+                        await Task.Delay(shockers[0].Delay + 300);
+                    }
+                    foreach (var shocker in shockers)
+                    {
+                        var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
+                        var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
+                        await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
+                    }
                 }             
             }
         }

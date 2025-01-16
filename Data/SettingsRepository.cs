@@ -2,6 +2,7 @@
 using ProfanityShock.Config;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,8 @@ namespace ProfanityShock.Data
                 var createTableCmd = connection.CreateCommand();
                 createTableCmd.CommandText = @" 
                 CREATE TABLE IF NOT EXISTS Settings (
-                Language TEXT PRIMARY KEY
+                Language TEXT PRIMARY KEY,
+                MinConfidence INTEGER NOT NULL
                 );";
                 await createTableCmd.ExecuteNonQueryAsync();
             }
@@ -54,6 +56,7 @@ namespace ProfanityShock.Data
                 return new SettingsConfig
                 {
                     Language = reader.GetString(0),
+                    MinConfidence = reader.GetInt32(1)
                 };
             }
             else
@@ -77,11 +80,26 @@ namespace ProfanityShock.Data
             // save new data
             var saveCmd = connection.CreateCommand();
             saveCmd.CommandText = @"
-            INSERT OR REPLACE INTO Settings (Language)
-            VALUES (@Language);";
+            INSERT OR REPLACE INTO Settings (Language, MinConfidence)
+            VALUES (@Language, @MinConfidence);";
 
-            saveCmd.Parameters.AddWithValue("@Language", item.Language);
+            if (item.Language == null)
+            {
+                saveCmd.Parameters.AddWithValue("@Language", "en-US");
+            }
+            else
+            {
+                saveCmd.Parameters.AddWithValue("@Language", item.Language);
+            }
 
+            if (item.MinConfidence == null)
+            {
+                saveCmd.Parameters.AddWithValue("@MinConfidence", 90);
+            }
+            else
+            {
+                saveCmd.Parameters.AddWithValue("@MinConfidence", item.MinConfidence);
+            }
             return await saveCmd.ExecuteNonQueryAsync();
         }
 

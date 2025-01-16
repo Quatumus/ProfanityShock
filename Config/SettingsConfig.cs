@@ -8,6 +8,7 @@ namespace ProfanityShock.Config
 {
     internal class SettingsConfig
     {
-        public string Language { get; set; }
+        public required string Language { get; set; } = "en-US";
+        public required int MinConfidence { get; set; } = 90;
     }
 }

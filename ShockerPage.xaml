@@ -4,7 +4,7 @@
              x:Class="ProfanityShock.ShockerPage"
              Title="Shocker Settings">
     <ScrollView>
-        <VerticalStackLayout>
+        <VerticalStackLayout Spacing="40">
             <StackLayout HorizontalOptions="Center">
                 <Label x:Name="delayLabel"
                        Text="Delay: N/Ams"
@@ -21,18 +21,29 @@
                        HorizontalOptions="Center"/>
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
                     <Button Text="None"
-                HorizontalOptions="FillAndExpand"
-                Clicked="OnWarningNoneButtonClicked">
+                            HorizontalOptions="FillAndExpand"
+                            Clicked="OnWarningNoneButtonClicked">
                     </Button>
                     <Button Text="Vibrate"
-                HorizontalOptions="FillAndExpand"
-                Clicked="OnWarningVibrateButtonClicked">
+                            HorizontalOptions="FillAndExpand"
+                            Clicked="OnWarningVibrateButtonClicked">
                     </Button>
                     <Button Text="Sound"
-                HorizontalOptions="FillAndExpand"
-                Clicked="OnWarningSoundButtonClicked">
+                            HorizontalOptions="FillAndExpand"
+                            Clicked="OnWarningSoundButtonClicked">
                     </Button>
+                    
                 </HorizontalStackLayout>
+                <Label x:Name="confidenceLabel"
+                       Text="Minimum Confidence: N/A"
+                       HorizontalOptions="Center" />
+                <StackLayout Orientation="Horizontal">
+                    <Slider x:Name="confidenceSlider"
+            Minimum="0"
+            Maximum="100"
+            HorizontalOptions="FillAndExpand"
+            ValueChanged="OnConfidenceSliderValueChanged" />
+                </StackLayout>
             </StackLayout>
 
             <CollectionView x:Name="shockersList"

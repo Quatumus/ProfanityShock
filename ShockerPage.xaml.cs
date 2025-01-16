@@ -15,6 +15,7 @@ public partial class ShockerPage : ContentPage
     List<Shocker> shockers = new List<Shocker>();
 
     internal int Delay = 0;
+    internal int MinConfidence = 0;
 
     public ShockerPage()
     {
@@ -30,22 +31,29 @@ public partial class ShockerPage : ContentPage
         await SyncShockers();
         shockersList.ItemsSource = shockers;
 
-        switch (shockers[0].Warning)
+        if (shockers.Count > 0)
         {
-            case ControlType.Stop:
-                warningModeLabel.Text = "Warning mode: None";
-                break;
-            case ControlType.Vibrate:
-                warningModeLabel.Text = "Warning mode: Vibrate";
-                break;
-            case ControlType.Sound:
-                warningModeLabel.Text = "Warning mode: Sound";
-                break;
-        }
-        Delay = shockers[0].Delay;
-        delaySlider.Value = Delay;
-        delayLabel.Text = $"Delay: {Delay}ms";
 
+            switch (shockers[0].Warning)
+            {
+                case ControlType.Stop:
+                    warningModeLabel.Text = "Warning mode: None";
+                    break;
+                case ControlType.Vibrate:
+                    warningModeLabel.Text = "Warning mode: Vibrate";
+                    break;
+                case ControlType.Sound:
+                    warningModeLabel.Text = "Warning mode: Sound";
+                    break;
+            }
+
+            Delay = shockers[0].Delay;
+            delaySlider.Value = Delay;
+            delayLabel.Text = $"Delay: {Delay}ms";
+
+            confidenceLabel.Text = SettingsRepository.LoadAsync().Result.MinConfidence.ToString() + "%";
+            confidenceSlider.Value = SettingsRepository.LoadAsync().Result.MinConfidence;
+        }
     }
 
     private async void OnDelaySliderValueChanged(object sender, EventArgs e)
@@ -61,11 +69,23 @@ public partial class ShockerPage : ContentPage
         
         delayLabel.Text = $"Delay: {Delay}ms";
     }
+    
+    private async void OnConfidenceSliderValueChanged(object sender, EventArgs e)
+    {
+        var slider = (Slider)sender;
+        MinConfidence = (int)slider.Value;
+        
+        SettingsConfig settingsConfig = new SettingsConfig() { Language = SettingsRepository.LoadAsync().Result?.Language, MinConfidence = MinConfidence };
 
-    private async Task SyncShockers()
+        await SettingsRepository.SaveItemAsync(settingsConfig);
+
+        confidenceLabel.Text = $"Minimum Confidence: {MinConfidence}%";
+    }
+
+    private async Task SyncShockers() // Get all owned shockers from API then update the local database with new shockers
     {
         shockers = await ShockerRepository.ListAsync();
-        // Get all owned shockers from API
+        
         var response = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/shockers/own").Result;
 
         if (response.IsSuccessStatusCode)
@@ -131,7 +151,7 @@ public partial class ShockerPage : ContentPage
         {
             Debug.Print(response.StatusCode.ToString());
         }
-        Debug.Print("Shocker count: " + shockers.Count);
+
         await ShockerRepository.SyncItemsAsync(shockers);
         shockers = await ShockerRepository.ListAsync();	
     }
@@ -142,11 +162,8 @@ public partial class ShockerPage : ContentPage
 
         if (button.BindingContext is not Shocker shocker)
             return;
-
-        shocker.Controltype = ControlType.Shock;
-        ShockerRepository.SaveItemAsync(shocker).Wait();
         
-        var shockersJson = new { shocks = new [] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
+        var shockersJson = new { shocks = new [] { new { id = shocker.ID, type = "Shock", intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock Manual API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
         var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
 
@@ -169,10 +186,7 @@ public partial class ShockerPage : ContentPage
         if (button.BindingContext is not Shocker shocker)
             return;
 
-        shocker.Controltype = ControlType.Vibrate;
-        ShockerRepository.SaveItemAsync(shocker).Wait();
-
-        var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
+        var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = "Vibrate", intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock Manual API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
         var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
  
@@ -195,11 +209,8 @@ public partial class ShockerPage : ContentPage
         if (button.BindingContext is not Shocker shocker)
             return;
 
-        shocker.Controltype = ControlType.Sound;
-        ShockerRepository.SaveItemAsync(shocker).Wait();
-
         // Send a post request to api
-        var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
+        var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = "Sound", intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock Manual API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
         var response = await NetManager.GetClient().PostAsync(AccountManager.GetConfig().Backend + "2/shockers/control", content);
 

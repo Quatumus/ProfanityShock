@@ -89,6 +89,9 @@ namespace ProfanityShock
                         await AccountManager.SaveConfig();
                     }
                 }
+
+                loggedInLayout.IsVisible = true;
+                loginLayout.IsVisible = false;
             }
             else
             {

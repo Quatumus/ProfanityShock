@@ -4,10 +4,10 @@
              x:Class="ProfanityShock.LiveView"
              Title="Voice Recognition">
     <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="70">
-        <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
+        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="70">
             <Label x:Name="textBox"
-                   HeightRequest="300"
-                   WidthRequest="400"
+                   HeightRequest="100"
+                   WidthRequest="300"
                    VerticalTextAlignment="Center"
                    HorizontalTextAlignment="Center"
                    VerticalOptions="Center"
@@ -16,7 +16,18 @@
                    FontSize="17"
                    BackgroundColor="{StaticResource Gray600}"
                    Text="This is where all your yap goes." />
-        </ScrollView>
+            <Label x:Name="confidenceBox"
+                   HeightRequest="100"
+                   WidthRequest="300"
+                   VerticalTextAlignment="Center"
+                   HorizontalTextAlignment="Center"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   LineBreakMode="WordWrap"
+                   FontSize="17"
+                   BackgroundColor="{StaticResource Gray600}"
+                   Text="Confidence on the match will be displayed here." />
+        </VerticalStackLayout>
         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="20">
             <Button x:Name="toggleButton"
                     WidthRequest="200"
@@ -52,7 +63,7 @@
                 </Picker.ItemsSource>
             </Picker>
             <Label x:Name="missingLanguageLabel"
-                   Text="Seems like your selected language is not installed on your system. Please install it from your windows settings."
+                   Text="Seems like your selected language is not installed on your system. Please install it from your windows language settings."
                    IsVisible="True" 
                    TextColor="{StaticResource PrimaryDark}"
                    LineBreakMode="WordWrap"

@@ -11,12 +11,12 @@ namespace ProfanityShock;
 class ImplementationClass : ILiveViewInterface
 {
     // Explicit interface member implementation:
-    void ILiveViewInterface.SetText(string sentence)
+    void ILiveViewInterface.SetText(string sentence, int confidence)
     {
         //get current content page from appshell
         var appShell = (AppShell)Application.Current.MainPage;
         var liveView = (LiveView)appShell.CurrentPage;
-        liveView.UpdateTextBox(sentence);
+        liveView.UpdateTextBox(sentence, confidence);
     }
 }
 public partial class LiveView : ContentPage
@@ -27,9 +27,10 @@ public partial class LiveView : ContentPage
         AccountManager.LoadSave().Wait();
     }
 
-    public void UpdateTextBox(string text)
+    public void UpdateTextBox(string text, int confidence)
     {
         textBox.Text = text;
+        confidenceBox.Text = confidence.ToString() + "%";
         Debug.Print("Updated text box!");
     }
 
