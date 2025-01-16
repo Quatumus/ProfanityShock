@@ -18,15 +18,15 @@ namespace ProfanityShock
 
             // AccountRepository.DropTableAsync().Wait();
 
-            AccountManager.LoadSave().Wait();
-
             if (AccountManager.GetConfig().Token == "")
             {
-                Debug.Print("No token found");
+                Debug.Print("No token in memory, loading from file");
                 loggedInLayout.IsVisible = false;
                 loginLayout.IsVisible = true;
+                AccountManager.LoadSave().Wait();
             }
-            else
+            
+            if (AccountManager.GetConfig().Token != "")
             {
                 Debug.Print("Token found: " + AccountManager.GetConfig().Token);
                 loginLayout.IsVisible = false;
@@ -41,6 +41,10 @@ namespace ProfanityShock
                 {
                     loggedInAsLabel.Text = nameProperty.GetString();
                 }
+            }
+            else
+            {
+                Debug.Print("No token found");
             }
         }
 

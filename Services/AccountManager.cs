@@ -12,7 +12,7 @@ namespace ProfanityShock.Services
 {
     public static class AccountManager
     {
-        static AppConfig AccountConfig = new AppConfig()
+        static AccountConfig AccountConfig = new AccountConfig()
         {
             Email = "",
             Password = "",
@@ -20,7 +20,7 @@ namespace ProfanityShock.Services
             Backend = new Uri("https://api.openshock.app")
         };
 
-        public static AppConfig GetConfig()
+        public static AccountConfig GetConfig()
         {
             return AccountConfig;
         }

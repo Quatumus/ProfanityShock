@@ -7,7 +7,7 @@ using ProfanityShock.Data;
 
 namespace ProfanityShock.Config
 {
-    public class AppConfig
+    public class AccountConfig
     {
         public Uri Backend { get; set; } = new Uri("https://api.openshock.app");
         public string? Token { get; set; }

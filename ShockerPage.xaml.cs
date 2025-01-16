@@ -22,12 +22,12 @@ public partial class ShockerPage : ContentPage
 
     }
 
-    protected override void OnAppearing()
+    protected async override void OnAppearing()
     {
         base.OnAppearing();
 
         // Code to run every time the page is switched to
-        SyncShockers().Wait();
+        await SyncShockers();
         shockersList.ItemsSource = shockers;
 
         switch (shockers[0].Warning)
@@ -45,7 +45,7 @@ public partial class ShockerPage : ContentPage
         Delay = shockers[0].Delay;
         delaySlider.Value = Delay;
         delayLabel.Text = $"Delay: {Delay}ms";
-        
+
     }
 
     private async void OnDelaySliderValueChanged(object sender, EventArgs e)
@@ -56,7 +56,7 @@ public partial class ShockerPage : ContentPage
         foreach (var shocker in shockers)
         {
             shocker.Delay = Delay;
-            await SettingsRepository.SaveItemAsync(shocker);
+            await ShockerRepository.SaveItemAsync(shocker);
         }
         
         delayLabel.Text = $"Delay: {Delay}ms";
@@ -64,7 +64,7 @@ public partial class ShockerPage : ContentPage
 
     private async Task SyncShockers()
     {
-        shockers = await SettingsRepository.ListAsync();
+        shockers = await ShockerRepository.ListAsync();
         // Get all owned shockers from API
         var response = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/shockers/own").Result;
 
@@ -105,9 +105,15 @@ public partial class ShockerPage : ContentPage
                                     Controltype = ControlType.Shock
                                 };
 
-                                if (shockers.Any(s => s.ID != id)) // only add to list if new
+                                Debug.Print(name);
+
+                                if (shockers.Any(s => s.ID != shocker.ID) || shockers.Count() == 0) // only add to list if new
                                 {
                                     shockers.Add(shocker);
+                                }
+                                else
+                                {
+                                    Debug.Print("Shocker already exists");
                                 }
                             }
                         }
@@ -125,8 +131,9 @@ public partial class ShockerPage : ContentPage
         {
             Debug.Print(response.StatusCode.ToString());
         }
-        SettingsRepository.SyncItemsAsync(shockers).Wait();
-        shockers = await SettingsRepository.ListAsync();	
+        Debug.Print("Shocker count: " + shockers.Count);
+        await ShockerRepository.SyncItemsAsync(shockers);
+        shockers = await ShockerRepository.ListAsync();	
     }
 
     private async void OnShockButtonClicked(object sender, EventArgs e)
@@ -137,7 +144,7 @@ public partial class ShockerPage : ContentPage
             return;
 
         shocker.Controltype = ControlType.Shock;
-        SettingsRepository.SaveItemAsync(shocker).Wait();
+        ShockerRepository.SaveItemAsync(shocker).Wait();
         
         var shockersJson = new { shocks = new [] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
@@ -163,7 +170,7 @@ public partial class ShockerPage : ContentPage
             return;
 
         shocker.Controltype = ControlType.Vibrate;
-        SettingsRepository.SaveItemAsync(shocker).Wait();
+        ShockerRepository.SaveItemAsync(shocker).Wait();
 
         var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
         var content = new StringContent(JsonSerializer.Serialize(shockersJson), Encoding.UTF8, "application/json");
@@ -189,7 +196,7 @@ public partial class ShockerPage : ContentPage
             return;
 
         shocker.Controltype = ControlType.Sound;
-        SettingsRepository.SaveItemAsync(shocker).Wait();
+        ShockerRepository.SaveItemAsync(shocker).Wait();
 
         // Send a post request to api
         var shockersJson = new { shocks = new[] { new { id = shocker.ID, type = shocker.Controltype.ToString(), intensity = shocker.Intensity, duration = shocker.Duration, exclusive = true } }, customName = "ProfanityShock API call" };
@@ -212,42 +219,48 @@ public partial class ShockerPage : ContentPage
     {
         var shocker = (Shocker)((Slider)sender).BindingContext;
         
-        await SettingsRepository.SaveItemAsync(shocker);
-        
-        var shocklist = await SettingsRepository.ListAsync();     
+        await ShockerRepository.SaveItemAsync(shocker);
+
+        var shocklist = await ShockerRepository.ListAsync();     
     }
 
     
     private async void OnWarningNoneButtonClicked(object sender, EventArgs e)
     {
-        foreach (var shocker in shockers)
-        {
-            shocker.Warning = ControlType.Stop;
-            await SettingsRepository.SaveItemAsync(shocker);
-        }
-        
-        warningModeLabel.Text = "Warning mode: None";
+        var button = (Button)sender;
+
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Stop;
+        await ShockerRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button none pressed on Shocker with ID: {shocker.ID}");
     }
 
     private async void OnWarningVibrateButtonClicked(object sender, EventArgs e)
     {
-        foreach (var shocker in shockers)
-        {
-            shocker.Warning = ControlType.Vibrate;
-            await SettingsRepository.SaveItemAsync(shocker);
-        }
+        var button = (Button)sender;
 
-        warningModeLabel.Text = "Warning mode: Vibrate";
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Vibrate;
+        await ShockerRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button vibrate pressed on Shocker with ID: {shocker.ID}");
     }
 
     private async void OnWarningSoundButtonClicked(object sender, EventArgs e)
     {
-        foreach (var shocker in shockers)
-        {
-            shocker.Warning = ControlType.Sound;
-            await SettingsRepository.SaveItemAsync(shocker);
-        }
+        var button = (Button)sender;
 
-        warningModeLabel.Text = "Warning mode: Sound";
+        if (button.BindingContext is not Shocker shocker)
+            return;
+
+        shocker.Warning = ControlType.Sound;
+        await ShockerRepository.SaveItemAsync(shocker);
+
+        Debug.Print($"Warning button sound pressed on Shocker with ID: {shocker.ID}");
     }
 }

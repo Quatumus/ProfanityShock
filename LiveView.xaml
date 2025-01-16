@@ -3,32 +3,61 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProfanityShock.LiveView"
              Title="Voice Recognition">
-    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand" Spacing="40">
+    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="70">
         <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
             <Label x:Name="textBox"
                    HeightRequest="300"
-                   WidthRequest="500"
+                   WidthRequest="400"
                    VerticalTextAlignment="Center"
                    HorizontalTextAlignment="Center"
                    VerticalOptions="Center"
                    HorizontalOptions="Center"
                    LineBreakMode="WordWrap"
+                   FontSize="17"
+                   BackgroundColor="{StaticResource Gray600}"
                    Text="This is where all your yap goes." />
         </ScrollView>
-        <Button x:Name="toggleButton"
-                WidthRequest="150"
-                HeightRequest="44"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                Text="Start Recognition"
-                Clicked="OnToggleRecognitionButtonClicked" />
-        <Button x:Name="recognitionModeButton"
-                WidthRequest="300"
-                HeightRequest="44"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                Text="Recognition mode: Azure + custom"
-                Clicked="OnRecognitionModeButtonClicked" />
-    </VerticalStackLayout>
+        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="20">
+            <Button x:Name="toggleButton"
+                    WidthRequest="200"
+                    HeightRequest="44"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Text="Start Recognition"
+                    Clicked="OnToggleRecognitionButtonClicked" />
+            <Picker x:Name="optionsPicker"
+                    WidthRequest="200"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="{StaticResource PrimaryDark}">
+                <Picker.Title>Language</Picker.Title>
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>English (US)</x:String>
+                        <x:String>English (UK)</x:String>
+                        <x:String>English (Canada)</x:String>
+                        <x:String>English (India)</x:String>
+                        <x:String>English (Australia)</x:String>
+                        <x:String>German</x:String>
+                        <x:String>French (French)</x:String>
+                        <x:String>French (Canada)</x:String>
+                        <x:String>Spanish (Spain)</x:String>
+                        <x:String>Spanish (Mexico)</x:String>
+                        <x:String>Chinese (Simplified, china)</x:String>
+                        <x:String>Italian</x:String>
+                        <x:String>Portuguese (Brasil)</x:String>
+                        <x:String>Danish</x:String>
+                        <x:String>Japanese</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+            <Label x:Name="missingLanguageLabel"
+                   Text="Seems like your selected language is not installed on your system. Please install it from your windows settings."
+                   IsVisible="True" 
+                   TextColor="{StaticResource PrimaryDark}"
+                   LineBreakMode="WordWrap"
+                   WidthRequest="200"/>
+        </VerticalStackLayout>
+    </HorizontalStackLayout>
 </ContentPage>
 

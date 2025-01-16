@@ -38,7 +38,7 @@ namespace ProfanityShock.Data
             _hasBeenInitialized = true;
         }
 
-        public static async Task<AppConfig?> LoadAsync()
+        public static async Task<AccountConfig?> LoadAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
@@ -50,7 +50,7 @@ namespace ProfanityShock.Data
             await using var reader = await selectCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                return new AppConfig
+                return new AccountConfig
                 {
                     Token = reader.GetString(0),
                     Password = reader.GetString(1),
@@ -65,7 +65,7 @@ namespace ProfanityShock.Data
 
         }
 
-        public static async Task<int> SaveItemAsync(AppConfig item)
+        public static async Task<int> SaveItemAsync(AccountConfig item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);

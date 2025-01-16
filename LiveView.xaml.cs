@@ -24,6 +24,7 @@ public partial class LiveView : ContentPage
     public LiveView()
 	{
 		InitializeComponent();
+        AccountManager.LoadSave().Wait();
     }
 
     public void UpdateTextBox(string text)
@@ -32,11 +33,6 @@ public partial class LiveView : ContentPage
         Debug.Print("Updated text box!");
     }
 
-    private void OnRecognitionModeButtonClicked(object sender, EventArgs e)
-    {
-        var button = (Button)sender;
-        button.Text = button.Text == "Recognition mode: Azure + custom" ? "Recognition mode: custom" : "Recognition mode: Azure + custom";
-    }
     private void OnToggleRecognitionButtonClicked(object sender, EventArgs e)
     {
         var button = (Button)sender;

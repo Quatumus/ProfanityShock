@@ -1,15 +1,18 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using ProfanityShock.Config;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ProfanityShock.Data
 {
     internal static class SettingsRepository
     {
         private static bool _hasBeenInitialized = false;
-        
+
         private static async Task Init()
         {
             if (_hasBeenInitialized)
@@ -22,15 +25,9 @@ namespace ProfanityShock.Data
             {
                 var createTableCmd = connection.CreateCommand();
                 createTableCmd.CommandText = @" 
-                CREATE TABLE IF NOT EXISTS Shocker (
-                ID TEXT PRIMARY KEY,
-                Name TEXT NOT NULL,
-                Intensity INTEGER NOT NULL,
-                Duration INTEGER NOT NULL,
-                Delay INTEGER NOT NULL,
-                Warning INTEGER NOT NULL,
-                Controltype INTEGER NOT NULL
-            );"; // warning 1 = vibrate, warning 2 = sound
+                CREATE TABLE IF NOT EXISTS Settings (
+                Language TEXT PRIMARY KEY
+                );";
                 await createTableCmd.ExecuteNonQueryAsync();
             }
             catch (Exception e)
@@ -42,114 +39,62 @@ namespace ProfanityShock.Data
             _hasBeenInitialized = true;
         }
 
-        public static async Task<List<Shocker>> ListAsync()
+        public static async Task<SettingsConfig?> LoadAsync()
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
             await connection.OpenAsync();
 
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT * FROM Shocker";
-            var categories = new List<Shocker>();
+            selectCmd.CommandText = "SELECT * FROM Settings";
 
             await using var reader = await selectCmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            if (await reader.ReadAsync())
             {
-                categories.Add(new Shocker
+                return new SettingsConfig
                 {
-                    ID = reader.GetString(0),
-                    Name = reader.GetString(1),
-                    Intensity = reader.GetInt32(2),
-                    Duration = reader.GetInt32(3),
-                    Delay = reader.GetInt32(4),
-                    Warning = (ControlType)reader.GetInt32(5),
-                    Controltype = (ControlType)reader.GetInt32(6)
-                });
+                    Language = reader.GetString(0),
+                };
             }
-
-            return categories;
-
-        }
-
-        public static async Task<int> SaveItemAsync(Shocker item)
-        {
-            await Init();
-            await using var connection = new SqliteConnection(Constants.DatabasePath);
-            await connection.OpenAsync();
-
-            var saveCmd = connection.CreateCommand();
-            saveCmd.CommandText = @"
-            UPDATE Shocker SET Name = @Name, Intensity = @Intensity, Duration = @Duration, Delay = @Delay, Warning = @Warning, Controltype = @Controltype
-            WHERE ID = @ID;";
-
-            saveCmd.Parameters.AddWithValue("@ID", item.ID);
-            saveCmd.Parameters.AddWithValue("@Name", item.Name);
-            saveCmd.Parameters.AddWithValue("@Intensity", item.Intensity);
-            saveCmd.Parameters.AddWithValue("@Duration", item.Duration);
-            saveCmd.Parameters.AddWithValue("@Delay", item.Delay);
-            saveCmd.Parameters.AddWithValue("@Warning", item.Warning);
-            saveCmd.Parameters.AddWithValue("@Controltype", item.Controltype);
-
-            var rowsAffected = await saveCmd.ExecuteNonQueryAsync();
-
-            if (rowsAffected == 0)
+            else
             {
-                saveCmd.CommandText = @"
-                INSERT INTO Shocker (ID, Name, Intensity, Duration, Delay, Warning, Controltype)
-                VALUES (@ID, @Name, @Intensity, @Duration, @Delay, @Warning, @Controltype);";
-
-                rowsAffected = await saveCmd.ExecuteNonQueryAsync();
+                return null;
             }
 
-            return rowsAffected;
         }
 
-        public static async Task<int> DeleteItemAsync(Shocker item)
+        public static async Task<int> SaveItemAsync(SettingsConfig item)
         {
             await Init();
             await using var connection = new SqliteConnection(Constants.DatabasePath);
             await connection.OpenAsync();
 
+            // delete old data
             var deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = "DELETE FROM Shocker WHERE ID = @ID";
-            deleteCmd.Parameters.AddWithValue("@ID", item.ID);
-
-            return await deleteCmd.ExecuteNonQueryAsync();
-        }
-
-        public static async Task<int> SyncItemsAsync(List<Shocker> items)
-        {
-            await Init();
-            await using var connection = new SqliteConnection(Constants.DatabasePath);
-            await connection.OpenAsync();
-
-            var deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = "DELETE FROM Shocker WHERE ID NOT IN (@ids)";
-            var ids = string.Join(",", items.Select(i => i.ID).Select(id => $"'{id}'"));
-            deleteCmd.Parameters.AddWithValue("@ids", ids);
-
+            deleteCmd.CommandText = "DELETE FROM Settings";
             await deleteCmd.ExecuteNonQueryAsync();
 
-            var insertCmd = connection.CreateCommand();
-            insertCmd.CommandText = @"
-            INSERT OR IGNORE INTO Shocker (ID, Name, Intensity, Duration, Delay, Warning, Controltype)
-            VALUES (@ID, @Name, @Intensity, @Duration, @Delay, @Warning, @Controltype);";
+            // save new data
+            var saveCmd = connection.CreateCommand();
+            saveCmd.CommandText = @"
+            INSERT OR REPLACE INTO Settings (Language)
+            VALUES (@Language);";
 
-            foreach (var item in items)
-            {
-                insertCmd.Parameters.Clear();
-                insertCmd.Parameters.AddWithValue("@ID", item.ID);
-                insertCmd.Parameters.AddWithValue("@Name", item.Name);
-                insertCmd.Parameters.AddWithValue("@Intensity", item.Intensity);
-                insertCmd.Parameters.AddWithValue("@Duration", item.Duration);
-                insertCmd.Parameters.AddWithValue("@Delay", item.Delay);
-                insertCmd.Parameters.AddWithValue("@Warning", item.Warning);
-                insertCmd.Parameters.AddWithValue("@Controltype", item.Controltype);
+            saveCmd.Parameters.AddWithValue("@Language", item.Language);
 
-                await insertCmd.ExecuteNonQueryAsync();
-            }
+            return await saveCmd.ExecuteNonQueryAsync();
+        }
 
-            return 1;
+        public static async Task<int> DeleteItemAsync(string item)
+        {
+            await Init();
+            await using var connection = new SqliteConnection(Constants.DatabasePath);
+            await connection.OpenAsync();
+
+            var deleteCmd = connection.CreateCommand();
+            deleteCmd.CommandText = "DELETE FROM Settings";
+
+            return await deleteCmd.ExecuteNonQueryAsync();
         }
 
         public static async Task DropTableAsync()
@@ -159,7 +104,7 @@ namespace ProfanityShock.Data
             await connection.OpenAsync();
 
             var dropTableCmd = connection.CreateCommand();
-            dropTableCmd.CommandText = "DROP TABLE IF EXISTS Shocker";
+            dropTableCmd.CommandText = "DROP TABLE IF EXISTS Settings";
 
             await dropTableCmd.ExecuteNonQueryAsync();
             _hasBeenInitialized = false;
