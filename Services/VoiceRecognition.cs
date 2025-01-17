@@ -66,7 +66,7 @@ namespace ProfanityShock.Services
             {
                 Debug.Print("Profanity detected");
 
-                if (e.Result.Confidence >= SettingsRepository.LoadAsync().Result?.MinConfidence)
+                if ((int)(e.Result.Confidence * 100) >= SettingsRepository.LoadAsync().Result?.MinConfidence)
                 {
                     var shockers = await ShockerRepository.ListAsync();
                     foreach (var shocker in shockers)
