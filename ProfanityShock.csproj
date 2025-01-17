@@ -76,8 +76,11 @@
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.30" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11-pre20241216174303" />
-		<PackageReference Include="System.Speech" Version="9.0.1" />
+		<PackageReference Include="Whisper.net" Version="1.7.4" />
+		<PackageReference Include="Whisper.net.Runtime" Version="1.7.4" />
+		<PackageReference Include="Whisper.Runtime" Version="1.4.2001" />
 	</ItemGroup>
 
 	<ItemGroup>
