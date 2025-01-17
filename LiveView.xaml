@@ -64,7 +64,7 @@
                 </Picker.ItemsSource>
             </Picker>
             <Label x:Name="missingLanguageLabel"
-                   Text="Make sure the selected language is installed on your system, you can check from the windows language settings."
+                   Text="Make sure the selected language is installed on your system. You can check from the windows language settings."
                    IsVisible="True" 
                    TextColor="{StaticResource PrimaryDark}"
                    LineBreakMode="WordWrap"

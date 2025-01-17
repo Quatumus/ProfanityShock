@@ -155,6 +155,10 @@ public partial class LiveView : ContentPage
     private void OnToggleRecognitionButtonClicked(object sender, EventArgs e)
     {
         var button = (Button)sender;
+
+        if (WordListManager.GetList().Count() == 0)
+        { return; }
+
         button.Text = button.Text == "Start Recognition" ? "Stop Recognition" : "Start Recognition";
     
         var words = WordListManager.GetList();
