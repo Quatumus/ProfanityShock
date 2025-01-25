@@ -95,6 +95,17 @@ public partial class ShockerPage : ContentPage
             if (jsonResponse != null && jsonResponse.TryGetValue("data", out var dataObject) &&
                 dataObject is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Array)
             {
+                var remoteShockers = dataElement.EnumerateArray()
+                    .Select(hub => hub.GetProperty("shockers"))
+                    .Where(shockersProperty => shockersProperty.ValueKind == JsonValueKind.Array)
+                    .SelectMany(shockersProperty => shockersProperty.EnumerateArray())
+                    .Where(shocker => shocker.TryGetProperty("id", out var idProperty) &&
+                        idProperty.ValueKind == JsonValueKind.String)
+                    .Select(shocker => shocker.GetProperty("id").GetString() ?? string.Empty)
+                    .ToArray();
+
+                shockers.RemoveAll(s => !remoteShockers.Contains(s.ID));
+
                 foreach (var hubElement in dataElement.EnumerateArray())
                 {
                     if (hubElement.TryGetProperty("shockers", out var shockersElement) &&
@@ -127,7 +138,7 @@ public partial class ShockerPage : ContentPage
 
                                 Debug.Print(name);
 
-                                if (shockers.Any(s => s.ID != shocker.ID) || shockers.Count() == 0) // only add to list if new
+                                if (!shockers.Any(s => s.ID == shocker.ID || shockers.Count() == 0)) // only add to list if new
                                 {
                                     shockers.Add(shocker);
                                 }
