@@ -9,11 +9,6 @@
                 x:Name="loginLayout"
                 Padding="30,0"
                 Spacing="25">
-                <Image
-                    Source="dotnet_bot.png"
-                    HeightRequest="185"
-                    Aspect="AspectFit"
-                    SemanticProperties.Description="dot net bot in a hovercraft number nine" />
 
                 <Label
                     Text="Login into your account!"
@@ -37,8 +32,7 @@
                 <Label
                     Text="Or use a token :3"
                     Style="{StaticResource SubHeadline}"
-                    SemanticProperties.HeadingLevel="Level2"
-                    SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+                    SemanticProperties.HeadingLevel="Level2" />
 
                 <Entry
                     x:Name="tokenEntry"

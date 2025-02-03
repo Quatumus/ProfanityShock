@@ -32,14 +32,25 @@ namespace ProfanityShock
                 loginLayout.IsVisible = false;
                 loggedInLayout.IsVisible = true;
                 var accountinfo = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/users/self").GetAwaiter().GetResult();
-                var json = accountinfo.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var dataObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-                if (dataObject != null && dataObject.TryGetValue("data", out var dataObjectValue) &&
-                    dataObjectValue is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Object &&
-                    dataElement.TryGetProperty("name", out var nameProperty) && nameProperty.ValueKind == JsonValueKind.String)
+                if (accountinfo.IsSuccessStatusCode)
                 {
-                    loggedInAsLabel.Text = nameProperty.GetString();
+                    var json = accountinfo.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var dataObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                    if (dataObject != null && dataObject.TryGetValue("data", out var dataObjectValue) &&
+                        dataObjectValue is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Object &&
+                        dataElement.TryGetProperty("name", out var nameProperty) && nameProperty.ValueKind == JsonValueKind.String)
+                    {
+                        loggedInAsLabel.Text = nameProperty.GetString();
+                    }
+                }
+                else
+                {
+                    Debug.Print("Previous credentials were invalid");
+                    AccountManager.GetConfig().Token = "";
+                    AccountManager.SaveConfig().Wait();
+                    loggedInLayout.IsVisible = false;
+                    loginLayout.IsVisible = true;
                 }
             }
             else
@@ -87,6 +98,20 @@ namespace ProfanityShock
                         Debug.Print("Token: " + token.ToString());
                         AccountManager.GetConfig().Token = (token.ToString());
                         await AccountManager.SaveConfig();
+
+                        var accountinfo = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/users/self").GetAwaiter().GetResult();
+                        if (accountinfo.IsSuccessStatusCode)
+                        {
+                            var namejson = accountinfo.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                            var dataObject = JsonSerializer.Deserialize<Dictionary<string, object>>(namejson);
+
+                            if (dataObject != null && dataObject.TryGetValue("data", out var dataObjectValue) &&
+                                dataObjectValue is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Object &&
+                                dataElement.TryGetProperty("name", out var nameProperty) && nameProperty.ValueKind == JsonValueKind.String)
+                            {
+                                loggedInAsLabel.Text = nameProperty.GetString();
+                            }
+                        }
                     }
                 }
 
@@ -173,8 +198,23 @@ namespace ProfanityShock
                     AccountManager.GetConfig().Token = OpenShockToken;
                     await AccountManager.SaveConfig();
 
+
                     loginLayout.IsVisible = false;
                     loggedInLayout.IsVisible = true;
+
+                    var accountinfo = NetManager.GetClient().GetAsync(AccountManager.GetConfig().Backend + "1/users/self").GetAwaiter().GetResult();
+                    if (accountinfo.IsSuccessStatusCode)
+                    {
+                        var namejson = accountinfo.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                        var dataObject = JsonSerializer.Deserialize<Dictionary<string, object>>(namejson);
+
+                        if (dataObject != null && dataObject.TryGetValue("data", out var dataObjectValue) &&
+                            dataObjectValue is JsonElement dataElement && dataElement.ValueKind == JsonValueKind.Object &&
+                            dataElement.TryGetProperty("name", out var nameProperty) && nameProperty.ValueKind == JsonValueKind.String)
+                        {
+                            loggedInAsLabel.Text = nameProperty.GetString();
+                        }
+                    }
                 }
                 else
                 {
