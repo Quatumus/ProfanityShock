@@ -51,8 +51,12 @@ public partial class ShockerPage : ContentPage
             delaySlider.Value = Delay;
             delayLabel.Text = $"Delay: {Delay}ms";
 
-            confidenceLabel.Text = SettingsRepository.LoadAsync().Result.MinConfidence.ToString() + "%";
-            confidenceSlider.Value = SettingsRepository.LoadAsync().Result.MinConfidence;
+            var settings = await SettingsRepository.LoadAsync();
+            if (settings != null)
+            {
+                confidenceLabel.Text = settings.MinConfidence.ToString() + "%";
+                confidenceSlider.Value = settings.MinConfidence;
+            }
         }
     }
 
